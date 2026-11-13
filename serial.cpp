@@ -83,5 +83,10 @@ bool send(const Device& device, std::string_view message)
     return true;
 }
 
+bool Device::send(std::string_view message)
+{
+
+    return serial::send(*this, message);
+}
 } // namespace serial
 } // namespace multicast

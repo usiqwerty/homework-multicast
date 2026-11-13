@@ -40,6 +40,13 @@ bool send(const Socket& socket, const sockaddr_in& address,
 
     return sent >= 0;
 }
+SocketMulticastClient::SocketMulticastClient(const Socket& socket, const sockaddr_in& address):
+MulticastClient(), _socket(socket), _address(address) {}
 
+bool SocketMulticastClient::send(const std::string_view message)
+{
+
+    return udp::send(_socket, _address, message);
+}
 } // namespace udp
 } // namespace multicast

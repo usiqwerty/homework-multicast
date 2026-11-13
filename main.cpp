@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "config.hpp"
+#include "serial.hpp"
 #include "udp.hpp"
 
 namespace
@@ -39,24 +40,32 @@ int main(int argc, char* argv[])
         using namespace multicast;
         Config config{argv[1]};
         udp::Socket socket{};
+        std::vector<MulticastClient*> clients;
 
         for ([[maybe_unused]] const auto& entry : config.GetUdpEntries())
         {
-            // TODO: добавьте клиента (используйте объект socket)
+            auto socketClient = new udp::SocketMulticastClient {socket, entry.address};
+            clients.push_back(socketClient);
         }
 
         for ([[maybe_unused]] const auto& entry : config.GetSerialEntries())
         {
-            // TODO: добавьте клиента (для каждого клиента создавайте
-            // новые объекты serial::Device)
+            auto serialClient = new serial::Device{entry.device};
+            clients.push_back(serialClient);
         }
 
         std::string input{};
         while (print_prompt(), std::getline(std::cin, input))
         {
             input.push_back('\n');
-
-            // TODO: отправьте всем клиентам
+            for (unsigned long i = 0; i < clients.size(); i++)
+            {
+                clients[i]->send(input);
+            }
+        }
+        for (unsigned long i = 0; i < clients.size(); i++)
+        {
+            delete clients[i];
         }
         return EXIT_SUCCESS;
     }
